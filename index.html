@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody id="main-table-items"></tbody>
-        <tfoot>
+        <tfoot id="add-edit-panel">
             <tr>
                 <td>
                     <input id="input-name" name="input-name" type="text" placeholder="Name"/>
@@ -39,22 +39,24 @@
                 </td>
                 <td></td>
                 <td></td>
-                <td class="btn"><i class="fa fa-save"></i></td>
-                <td></td>
+                <td class="btn" id="save"><i class="fa fa-save"></i></td>
+                <td class="btn" id="close-panel"><i class="fa fa-times"></i></td>
             </tr>
         </tfoot>
     </table>
     <div id="btn-add-container">
         <button id="btn-add" name="btn-add">
             <i class="fa fa-plus inline"></i>
-            <div class="inline">Add Note</div>
+            Add Note
         </button>
     </div>
     <table>
         <thead>
-            <th>Note Category</th>
-            <th>Active</th>
-            <th>Archived</th>
+            <tr>
+                <th>Note Category</th>
+                <th>Active</th>
+                <th>Archived</th>
+            </tr>
         </thead>
         <tbody id="summary-table-items">
 
@@ -62,4 +64,5 @@
     </table>
 
 </body>
+<script type='module' src='DOMService.js'></script>
 </html>

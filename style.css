@@ -30,10 +30,11 @@ button:hover {
     background-color: #c7eac7;
 }
 .btn {
-    display: grid;
-    place-items: center;
+    text-align: center;
 }
-.inline {
-    display: inline-block;
-    margin: 2px;
+button i {
+    margin-right: 5px;
+}
+#add-edit-panel {
+    display: none;
 }
