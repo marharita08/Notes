@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Category</th>
+                <th>Content</th>
+                <th>Dates</th>
+                <th><i class="fa fa-pencil"></i></th>
+                <th><i class="fa fa-archive"></i></th>
+                <th><i class="fa fa-trash"></i></th>
+            </tr>
+        </thead>
+        <tbody id="main-table-items"></tbody>
+        <tfoot>
+            <tr>
+                <td>
+                    <input id="input-name" name="input-name" type="text" placeholder="Name"/>
+                </td>
+                <td></td>
+                <td>
+                    <select id="select-category" name="select-category">
+                        <option>Task</option>
+                        <option>Idea</option>
+                        <option>Random Thought</option>
+                    </select>
+                </td>
+                <td>
+                    <input id="input-content" name="input-content" type="text" placeholder="Content"/>
+                </td>
+                <td></td>
+                <td colspan="3"></td>
+            </tr>
+        </tfoot>
+    </table>
+    <button id="btn-add-note" name="btn-add-note"><i class="fa fa-plus"></i>Add Note</button>
+    <table>
+        <thead>
+            <th>Note Category</th>
+            <th>Active</th>
+            <th>Archived</th>
+        </thead>
+        <tbody id="summary-table-items">
+
+        </tbody>
+    </table>
+
+</body>
+</html>
