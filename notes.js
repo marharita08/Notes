@@ -1,14 +1,14 @@
 import {getNumber} from "./counter.js";
 export let notes;
 
-export function loadNotesFromJSONFile(fn) {
+export function loadNotesFromJSONFile(loadNotesToTable) {
     const jsonFile = 'data.json';
 
     fetch(jsonFile)
         .then(response => response.json())
         .then(data => {
             notes = data;
-            fn(notes);
+            loadNotesToTable(notes);
         })
         .catch(error => {
             console.error('Error occurred during JSON file loading:', error);
@@ -26,11 +26,15 @@ export function deleteNote(id) {
 }
 
 export function updateNote(note) {
-    const index = notes.findIndex((currNote => currNote.id === note.id));
+    const index = getIndexById(note.id);
     const created = notes[index].created;
     notes[index] = {created, ...note};
 }
 
 export function getNoteById(id) {
-    return notes[notes.findIndex(note => note.id === id)];
+    return notes[getIndexById(id)];
+}
+
+export function getIndexById(id) {
+    return notes.findIndex(note => note.id === id);
 }

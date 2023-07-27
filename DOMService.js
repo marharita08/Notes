@@ -1,5 +1,5 @@
 import {findDates} from "./findDates.js";
-import {addNote, getNoteById, updateNote, loadNotesFromJSONFile, notes} from "./notes.js";
+import {addNote, getNoteById, updateNote, deleteNote, getIndexById, loadNotesFromJSONFile, notes} from "./notes.js";
 
 const saveBtn = document.querySelector("#save");
 const mainTableBody = document.querySelector("#main-table-items");
@@ -87,6 +87,7 @@ function addNewRow(note) {
     deleteCell.classList.add(btnClass);
 
     updateCell.addEventListener('click', () => showPanelToEdit(note.id));
+    deleteCell.addEventListener('click', () => removeNote(note.id));
 
     newRow.appendChild(nameCell);
     newRow.appendChild(createdCell);
@@ -114,6 +115,11 @@ function saveEditedNote(id) {
     document.querySelector(`#${datesIdPrefix}${id}`).textContent = dates;
 
     hidePanel();
+}
+
+function removeNote(id) {
+    mainTableBody.deleteRow(getIndexById(id));
+    deleteNote(id);
 }
 
 document.addEventListener("DOMContentLoaded", () => loadNotesFromJSONFile(loadNotesToTable));
