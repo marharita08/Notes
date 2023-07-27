@@ -1,4 +1,4 @@
-let counter = 1;
+let counter = 8;
 
 export function getNumber() {
     return counter++;

@@ -26,7 +26,7 @@ button {
     padding: 10px;
     border: none;
 }
-button:hover {
+button:hover, .btn:hover {
     background-color: #c7eac7;
 }
 .btn {
