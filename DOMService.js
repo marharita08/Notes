@@ -1,5 +1,6 @@
 import {findDates} from "./findDates.js";
-import {addNote, getNoteById, updateNote, deleteNote,
+import {getCategories} from "./categories.js";
+import {addNote, getNoteById, updateNote, deleteNote, countNotesByCategoryAndArchived,
     getActiveIndexById, loadNotesFromJSONFile, getActiveNotes, archiveNote} from "./notes.js";
 
 const saveBtn = document.querySelector("#save");
@@ -10,11 +11,14 @@ const closeBtn = document.querySelector("#close-panel");
 const nameInput = document.querySelector("#input-name");
 const categorySelect = document.querySelector("#select-category");
 const contentInput = document.querySelector("#input-content");
+const summaryTableBody = document.querySelector("#summary-table-items");
 
 const nameIdPrefix = "name";
 const categoryIdPrefix = "category";
 const contentIdPrefix = "content";
 const datesIdPrefix = "dates";
+const activeIdPrefix = "active";
+const archivedIdPrefix = "archived";
 
 function showPanelToAdd() {
     nameInput.value = '';
@@ -38,7 +42,7 @@ function hidePanel() {
 }
 
 function loadNotesToTable() {
-    getActiveNotes().forEach(note => addNewRow(note));
+    getActiveNotes().forEach(note => addNewRowToMainTable(note));
 }
 
 function saveNewNote () {
@@ -47,16 +51,19 @@ function saveNewNote () {
     const category = categorySelect.value;
     const content = contentInput.value;
     const dates = findDates(content);
+    const archived = false;
 
-    let note = {name, created, category, content, dates};
+    let note = {name, created, category, content, dates, archived};
     const id = addNote(note);
     note = {id, ...note};
-    addNewRow(note);
+    addNewRowToMainTable(note);
+
+    refreshSummaryTable();
 
     hidePanel();
 }
 
-function addNewRow(note) {
+function addNewRowToMainTable(note) {
     const newRow = document.createElement('tr');
 
     const nameCell = document.createElement('td');
@@ -117,18 +124,70 @@ function saveEditedNote(id) {
     document.querySelector(`#${datesIdPrefix}${id}`).textContent = dates;
 
     hidePanel();
+    refreshSummaryTable();
 }
 
 function removeNote(id) {
     mainTableBody.deleteRow(getActiveIndexById(id));
     deleteNote(id);
+    refreshSummaryTable();
 }
 
 function archiveNoteHandle(id) {
     mainTableBody.deleteRow(getActiveIndexById(id));
     archiveNote(id);
+    refreshSummaryTable();
 }
 
-document.addEventListener("DOMContentLoaded", () => loadNotesFromJSONFile(loadNotesToTable));
+function fillSelectWithCategories() {
+    getCategories().forEach(category => {
+        const option = document.createElement("option");
+        option.text = category;
+        categorySelect.add(option);
+    })
+}
+
+function fillSummaryTable() {
+    getCategories().forEach((category, index) => addNewRowToSummaryTable(category, index));
+}
+
+function addNewRowToSummaryTable(category, index) {
+    const newRow = document.createElement('tr');
+
+    const categoryCell = document.createElement('td');
+    const activeCountCell = document.createElement('td');
+    const archivedCountCell = document.createElement('td');
+
+    categoryCell.textContent = category;
+    activeCountCell.textContent = countNotesByCategoryAndArchived(category, false);
+    archivedCountCell.textContent = countNotesByCategoryAndArchived(category, true);
+
+    activeCountCell.id = activeIdPrefix + index;
+    archivedCountCell.id = archivedIdPrefix + index;
+
+    newRow.appendChild(categoryCell);
+    newRow.appendChild(activeCountCell);
+    newRow.appendChild(archivedCountCell);
+
+    summaryTableBody.appendChild(newRow);
+}
+
+function refreshSummaryTable() {
+    getCategories().forEach((category, index) => {
+        refreshCellInSummaryTable(category, index);
+    });
+}
+
+function refreshCellInSummaryTable(category, index) {
+    const activeNotes = countNotesByCategoryAndArchived(category, false);
+    const archivedNotes = countNotesByCategoryAndArchived(category, true);
+    document.querySelector(`#${archivedIdPrefix}${index}`).textContent = archivedNotes;
+    document.querySelector(`#${activeIdPrefix}${index}`).textContent = activeNotes;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadNotesFromJSONFile(loadNotesToTable, fillSummaryTable);
+    fillSelectWithCategories();
+});
 addBtn.addEventListener('click', showPanelToAdd);
 closeBtn.addEventListener('click', hidePanel);
