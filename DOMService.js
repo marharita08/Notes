@@ -1,5 +1,6 @@
 import {findDates} from "./findDates.js";
-import {addNote, getNoteById, updateNote, deleteNote, getIndexById, loadNotesFromJSONFile, notes} from "./notes.js";
+import {addNote, getNoteById, updateNote, deleteNote,
+    getActiveIndexById, loadNotesFromJSONFile, getActiveNotes, archiveNote} from "./notes.js";
 
 const saveBtn = document.querySelector("#save");
 const mainTableBody = document.querySelector("#main-table-items");
@@ -37,7 +38,7 @@ function hidePanel() {
 }
 
 function loadNotesToTable() {
-    notes.forEach(note => addNewRow(note));
+    getActiveNotes().forEach(note => addNewRow(note));
 }
 
 function saveNewNote () {
@@ -87,6 +88,7 @@ function addNewRow(note) {
     deleteCell.classList.add(btnClass);
 
     updateCell.addEventListener('click', () => showPanelToEdit(note.id));
+    archiveCell.addEventListener('click', () => archiveNoteHandle(note.id));
     deleteCell.addEventListener('click', () => removeNote(note.id));
 
     newRow.appendChild(nameCell);
@@ -118,8 +120,13 @@ function saveEditedNote(id) {
 }
 
 function removeNote(id) {
-    mainTableBody.deleteRow(getIndexById(id));
+    mainTableBody.deleteRow(getActiveIndexById(id));
     deleteNote(id);
+}
+
+function archiveNoteHandle(id) {
+    mainTableBody.deleteRow(getActiveIndexById(id));
+    archiveNote(id);
 }
 
 document.addEventListener("DOMContentLoaded", () => loadNotesFromJSONFile(loadNotesToTable));
