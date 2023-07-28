@@ -1,16 +1,18 @@
 import {getNumber} from "./counter.js";
+/*
+    Array of notes
+ */
 
 let notes;
 
-export function loadNotesFromJSONFile(loadNotesToTable, fillSummaryTable) {
+export function loadNotesFromJSONFile(functions) {
     const jsonFile = 'data.json';
 
     fetch(jsonFile)
         .then(response => response.json())
         .then(data => {
             notes = data;
-            loadNotesToTable();
-            fillSummaryTable();
+            functions.forEach(fn => fn());
         })
         .catch(error => {
             console.error('Error occurred during JSON file loading:', error);
@@ -46,10 +48,6 @@ export function getActiveNotes() {
     return notes.filter(note => !note.archived);
 }
 
-export function getActiveIndexById(id) {
-    return getActiveNotes().findIndex(note => note.id === id);
-}
-
 export function getArchivedNotes() {
     return notes.filter(note => note.archived);
 }
@@ -62,6 +60,10 @@ export function unarchiveNote(id) {
     notes[getIndexById(id)].archived = false;
 }
 
-export function countNotesByCategoryAndArchived(category, archived) {
-    return notes.filter(note => note.category === category && note.archived === archived).length;
+export function countActiveNoteByCategory(category) {
+    return notes.filter(note => note.category === category && !note.archived).length
+}
+
+export function countArchivedNoteByCategory(category) {
+    return notes.filter(note => note.category === category && note.archived).length
 }

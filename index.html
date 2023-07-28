@@ -5,6 +5,7 @@
     <title>Notes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" type="img/png" href="icon.png">
 </head>
 <body>
     <table>
@@ -15,9 +16,9 @@
                 <th>Category</th>
                 <th>Content</th>
                 <th>Dates</th>
-                <th><i class="fa fa-pencil"></i></th>
-                <th><i class="fa fa-archive"></i></th>
-                <th><i class="fa fa-trash"></i></th>
+                <th id="edit-cell"><i class="fa fa-pencil"></i></th>
+                <th id="archive-cell"><i class="fa fa-archive"></i></th>
+                <th id="delete-cell"><i class="fa fa-trash"></i></th>
             </tr>
         </thead>
         <tbody id="main-table-items"></tbody>
@@ -40,12 +41,29 @@
             </tr>
         </tfoot>
     </table>
-    <div id="btn-add-container">
+    <div id="btn-container">
+        <button id="btn-open-close-archive">
+            <i class="fa fa-archive"></i>
+            Open Archive
+        </button>
         <button id="btn-add" name="btn-add">
             <i class="fa fa-plus inline"></i>
             Add Note
         </button>
     </div>
+    <table id="archived-table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Created</th>
+            <th>Category</th>
+            <th>Content</th>
+            <th>Dates</th>
+            <th id="unarchive-cell"><i class="fa fa-sign-out"></i></th>
+        </tr>
+        </thead>
+        <tbody id="archived-table-items"></tbody>
+    </table>
     <table>
         <thead>
             <tr>

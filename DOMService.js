@@ -1,193 +1,378 @@
 import {findDates} from "./findDates.js";
 import {getCategories} from "./categories.js";
-import {addNote, getNoteById, updateNote, deleteNote, countNotesByCategoryAndArchived,
-    getActiveIndexById, loadNotesFromJSONFile, getActiveNotes, archiveNote} from "./notes.js";
+import {addNote, getNoteById, updateNote, deleteNote, getArchivedNotes, countArchivedNoteByCategory,
+    loadNotesFromJSONFile, getActiveNotes, archiveNote, unarchiveNote, countActiveNoteByCategory} from "./notes.js";
+import {styleDisplay, archiveBtn, element, noteKey, btnClass, eventListenerType, activeIdPrefix, archivedIdPrefix} from "./strings.js";
 
-const saveBtn = document.querySelector("#save");
-const mainTableBody = document.querySelector("#main-table-items");
+// Add/Edit panel
 const addEditPanel = document.querySelector("#add-edit-panel");
-const addBtn = document.querySelector("#btn-add");
+// Icon buttons
+const saveBtn = document.querySelector("#save");
 const closeBtn = document.querySelector("#close-panel");
+// Inputs and select
 const nameInput = document.querySelector("#input-name");
 const categorySelect = document.querySelector("#select-category");
 const contentInput = document.querySelector("#input-content");
+// Table
+const archivedTable = document.querySelector("#archived-table");
+// Table bodies
+const mainTableBody = document.querySelector("#main-table-items");
 const summaryTableBody = document.querySelector("#summary-table-items");
+const archivedTableBody = document.querySelector("#archived-table-items");
+// Buttons
+const openCloseArchiveBtn = document.querySelector("#btn-open-close-archive");
+const addBtn = document.querySelector("#btn-add");
 
-const nameIdPrefix = "name";
-const categoryIdPrefix = "category";
-const contentIdPrefix = "content";
-const datesIdPrefix = "dates";
-const activeIdPrefix = "active";
-const archivedIdPrefix = "archived";
+
+/*
+    Show/hide 'add/edit panel'
+*/
 
 function showPanelToAdd() {
+    // refresh inputs
     nameInput.value = '';
     categorySelect.selectedIndex = 0;
     contentInput.value = '';
-    addEditPanel.style.display = "table-row-group";
+    // make panel visible
+    addEditPanel.style.display = styleDisplay.row;
+    // change onclick for save icon button
     saveBtn.onclick = saveNewNote;
 }
 
 function showPanelToEdit(id) {
+    // get note
     const note = getNoteById(id);
+    // load note data to inputs
     nameInput.value = note.name;
     categorySelect.value = note.category;
     contentInput.value = note.content;
-    addEditPanel.style.display = "table-row-group";
+    // make panel visible
+    addEditPanel.style.display = styleDisplay.row;
+    // change onclick for save icon button
     saveBtn.onclick = () => saveEditedNote(id);
 }
 
 function hidePanel() {
-    addEditPanel.style.display = "none";
+    addEditPanel.style.display = styleDisplay.none;
 }
 
-function loadNotesToTable() {
-    getActiveNotes().forEach(note => addNewRowToMainTable(note));
+/*
+    Show/hide archive table
+*/
+
+function openCloseArchiveTable() {
+    if (archivedTable.style.display === styleDisplay.none || archivedTable.style.display === styleDisplay.empty) {
+        archivedTable.style.display = styleDisplay.table;
+        openCloseArchiveBtn.lastChild.data = archiveBtn.close;
+    } else {
+        archivedTable.style.display = styleDisplay.none;
+        openCloseArchiveBtn.lastChild.data = archiveBtn.open;
+    }
 }
 
-function saveNewNote () {
-    const name = nameInput.value;
-    const created = new Date().toLocaleDateString();
-    const category = categorySelect.value;
-    const content = contentInput.value;
-    const dates = findDates(content);
-    const archived = false;
+/*
+    Create table row and cell
+ */
 
-    let note = {name, created, category, content, dates, archived};
-    const id = addNote(note);
-    note = {id, ...note};
-    addNewRowToMainTable(note);
-
-    refreshSummaryTable();
-
-    hidePanel();
+function createTableRow() {
+    return document.createElement(element.row);
 }
+
+function createTableCell() {
+    return document.createElement(element.cell);
+}
+
+/*
+    Get row common for both main and archive tables
+*/
+
+function getCommonRow(note) {
+    // create row
+    const newRow = createTableRow();
+    newRow.id = note.id;
+
+    for (const key in note) {
+        if (key !== noteKey.id && key !== noteKey.archived) {
+            // create cell
+            const cell = createTableCell();
+            // add id to cell
+            cell.id = key + note.id;
+            // add note data to cell
+            cell.textContent = note[key];
+            // add cell to row
+            newRow.appendChild(cell);
+        }
+    }
+
+    return newRow;
+}
+
+/*
+    Add, update, remove row in main table
+ */
 
 function addNewRowToMainTable(note) {
-    const newRow = document.createElement('tr');
+    // get row common for both main and archive tables
+    const newRow = getCommonRow(note);
 
-    const nameCell = document.createElement('td');
-    const createdCell = document.createElement('td');
-    const categoryCell = document.createElement('td');
-    const contentCell = document.createElement('td');
-    const datesCell = document.createElement('td');
-    const updateCell = document.createElement('td');
-    const archiveCell = document.createElement('td');
-    const deleteCell = document.createElement('td');
+    // add cells used only for main table
+    // create cells
+    const updateCell = createTableCell();
+    const archiveCell = createTableCell();
+    const deleteCell = createTableCell();
 
-    nameCell.id = nameIdPrefix + note.id;
-    categoryCell.id = categoryIdPrefix + note.id;
-    contentCell.id = contentIdPrefix + note.id;
-    datesCell.id = datesIdPrefix + note.id;
+    // add icons to cells
+    const editIcon = document.querySelector("#edit-cell").innerHTML;
+    const archiveIcon = document.querySelector("#archive-cell").innerHTML;
+    const deleteIcon = document.querySelector("#delete-cell").innerHTML;
+    updateCell.innerHTML = editIcon;
+    archiveCell.innerHTML = archiveIcon;
+    deleteCell.innerHTML = deleteIcon;
 
-    nameCell.textContent = note.name;
-    createdCell.textContent = note.created;
-    categoryCell.textContent = note.category;
-    contentCell.textContent = note.content;
-    datesCell.textContent = note.dates;
-    updateCell.innerHTML = "<i class=\"fa fa-pencil\"></i>";
-    archiveCell.innerHTML = "<i class=\"fa fa-archive\"></i>";
-    deleteCell.innerHTML = "<i class=\"fa fa-trash\"></i>";
-
-    const btnClass = "btn"
+    // add class to cells
     updateCell.classList.add(btnClass);
     archiveCell.classList.add(btnClass);
     deleteCell.classList.add(btnClass);
 
-    updateCell.addEventListener('click', () => showPanelToEdit(note.id));
-    archiveCell.addEventListener('click', () => archiveNoteHandle(note.id));
-    deleteCell.addEventListener('click', () => removeNote(note.id));
+    // add onclick functions to each cell
+    updateCell.addEventListener(eventListenerType.click, () => showPanelToEdit(note.id));
+    archiveCell.addEventListener(eventListenerType.click, () => archiveNoteHandle(note.id));
+    deleteCell.addEventListener(eventListenerType.click, () => removeNote(note.id));
 
-    newRow.appendChild(nameCell);
-    newRow.appendChild(createdCell);
-    newRow.appendChild(categoryCell);
-    newRow.appendChild(contentCell);
-    newRow.appendChild(datesCell);
+    // add cells to row
     newRow.appendChild(updateCell);
     newRow.appendChild(archiveCell);
     newRow.appendChild(deleteCell);
 
+    // add row to table body
     mainTableBody.appendChild(newRow);
 }
 
-function saveEditedNote(id) {
+function updateRowInMainTable(note) {
+    for (const key in note) {
+        if (key !== noteKey.id && key !== noteKey.archived) {
+            document.querySelector(`#${key}${note.id}`).textContent = note[key];
+        }
+    }
+}
+
+function removeRowFromMainTableByNoteId(id) {
+    const row = document.getElementById(id);
+    mainTableBody.removeChild(row);
+}
+
+/*
+    Save added note. Handles onclick on save icon if add/edit panel was open using 'Add Note' button
+ */
+
+function saveNewNote () {
+    // set current date
+    const created = new Date().toLocaleDateString();
+    // read data from inputs
     const name = nameInput.value;
     const category = categorySelect.value;
     const content = contentInput.value;
+    // find dates in content
     const dates = findDates(content);
+    // set initial value
+    const archived = false;
 
-    updateNote({id, name, category, content, dates});
+    // create new note
+    let note = {name, created, category, content, dates, archived};
+    // add created note to array of notes
+    const id = addNote(note);
+    note = {id, ...note};
+    // write added note to main table
+    addNewRowToMainTable(note);
 
-    document.querySelector(`#${nameIdPrefix}${id}`).textContent = name;
-    document.querySelector(`#${categoryIdPrefix}${id}`).textContent = category;
-    document.querySelector(`#${contentIdPrefix}${id}`).textContent = content;
-    document.querySelector(`#${datesIdPrefix}${id}`).textContent = dates;
+    // recount amount of notes in summary table
+    refreshSummaryTable();
 
     hidePanel();
+}
+
+/*
+    Save added note. Handles onclick on save icon if add/edit panel was open using edit icon
+ */
+
+function saveEditedNote(id) {
+    // read values from inputs
+    const name = nameInput.value;
+    const category = categorySelect.value;
+    const content = contentInput.value;
+    // find dates in content
+    const dates = findDates(content);
+
+    // update note in array
+    const note = {id, name, category, content, dates};
+    updateNote(note);
+
+    // update note in main table
+    updateRowInMainTable(note);
+    //hide add/edit panel
+    hidePanel();
+    // recount amount of notes in summary table
     refreshSummaryTable();
 }
+
+/*
+    Remove note. Handles onclick on delete icon
+ */
 
 function removeNote(id) {
-    mainTableBody.deleteRow(getActiveIndexById(id));
+    // remove note from main table
+    removeRowFromMainTableByNoteId(id)
+    // remove note from array
     deleteNote(id);
+    // recount amount of notes in summary table
     refreshSummaryTable();
 }
 
+/*
+    Archive note. Handles onclick on archive icon
+ */
+
 function archiveNoteHandle(id) {
-    mainTableBody.deleteRow(getActiveIndexById(id));
+    // delete note from main table
+    removeRowFromMainTableByNoteId(id);
+    // update note in array
     archiveNote(id);
+    // add note to archive
+    addNewRowToArchive(getNoteById(id));
+    // recount amount of notes in summary table
     refreshSummaryTable();
 }
+
+/*
+    Add new row to summary table. Used to load initial data
+ */
+
+function addNewRowToSummaryTable(category, index) {
+    // create new row
+    const newRow = createTableRow();
+
+    // create cells
+    const categoryCell = createTableCell();
+    const activeCountCell = createTableCell();
+    const archivedCountCell = createTableCell();
+
+    // fill cells with data
+    categoryCell.textContent = category;
+    activeCountCell.textContent = countActiveNoteByCategory(category);
+    archivedCountCell.textContent = countArchivedNoteByCategory(category);
+
+    // add ids to cells
+    activeCountCell.id = activeIdPrefix + index;
+    archivedCountCell.id = archivedIdPrefix + index;
+
+    // add cells to row
+    newRow.appendChild(categoryCell);
+    newRow.appendChild(activeCountCell);
+    newRow.appendChild(archivedCountCell);
+
+    // add row to table
+    summaryTableBody.appendChild(newRow);
+}
+
+/*
+    Refresh row in summary table. Used on data change
+ */
+
+function refreshRowInSummaryTable(category, index) {
+    const activeNotes = countActiveNoteByCategory(category);
+    const archivedNotes = countArchivedNoteByCategory(category);
+    document.querySelector(`#${archivedIdPrefix}${index}`).textContent = archivedNotes;
+    document.querySelector(`#${activeIdPrefix}${index}`).textContent = activeNotes;
+}
+
+/*
+    Add, remove row in archive table
+ */
+
+function addNewRowToArchive(note) {
+    const newRow = getCommonRow(note);
+
+    // add unarchive icon button to row
+    const unarchiveCell = createTableCell();
+    const unarchiveIcon = document.querySelector("#unarchive-cell").innerHTML;
+    unarchiveCell.innerHTML = unarchiveIcon;
+    unarchiveCell.classList.add(btnClass);
+    unarchiveCell.addEventListener(eventListenerType.click, () => unarchiveNoteHandle(note.id));
+
+    newRow.appendChild(unarchiveCell);
+
+    archivedTableBody.appendChild(newRow);
+}
+
+function removeRowFromArchiveByNoteId(id) {
+    const row = document.getElementById(id);
+    archivedTableBody.removeChild(row);
+}
+
+/*
+    Unarchive note. Handles onclick on unarchive icon
+ */
+
+function unarchiveNoteHandle(id) {
+    // delete note from archive table
+    removeRowFromArchiveByNoteId(id);
+    // add note to main table
+    addNewRowToMainTable(getNoteById(id));
+    // update note in array
+    unarchiveNote(id);
+    // recount amount of notes in summary table
+    refreshSummaryTable();
+}
+
+/*
+    Load categories into select
+ */
 
 function fillSelectWithCategories() {
     getCategories().forEach(category => {
-        const option = document.createElement("option");
+        const option = document.createElement(element.option);
         option.text = category;
         categorySelect.add(option);
     })
 }
 
+/*
+    Load initial data into tables
+ */
+
+function loadNotesIntoTable() {
+    // show each active note in main table
+    getActiveNotes().forEach(note => addNewRowToMainTable(note));
+}
+
+function loadArchivedNotesIntoTable() {
+    // add each archived note to archive table
+    getArchivedNotes().forEach(note => addNewRowToArchive(note));
+}
+
 function fillSummaryTable() {
+    // add each category to summary table
     getCategories().forEach((category, index) => addNewRowToSummaryTable(category, index));
 }
 
-function addNewRowToSummaryTable(category, index) {
-    const newRow = document.createElement('tr');
-
-    const categoryCell = document.createElement('td');
-    const activeCountCell = document.createElement('td');
-    const archivedCountCell = document.createElement('td');
-
-    categoryCell.textContent = category;
-    activeCountCell.textContent = countNotesByCategoryAndArchived(category, false);
-    archivedCountCell.textContent = countNotesByCategoryAndArchived(category, true);
-
-    activeCountCell.id = activeIdPrefix + index;
-    archivedCountCell.id = archivedIdPrefix + index;
-
-    newRow.appendChild(categoryCell);
-    newRow.appendChild(activeCountCell);
-    newRow.appendChild(archivedCountCell);
-
-    summaryTableBody.appendChild(newRow);
-}
+/*
+    Refresh summary table
+ */
 
 function refreshSummaryTable() {
+    // refresh each row in summary table
     getCategories().forEach((category, index) => {
-        refreshCellInSummaryTable(category, index);
+        refreshRowInSummaryTable(category, index);
     });
 }
 
-function refreshCellInSummaryTable(category, index) {
-    const activeNotes = countNotesByCategoryAndArchived(category, false);
-    const archivedNotes = countNotesByCategoryAndArchived(category, true);
-    document.querySelector(`#${archivedIdPrefix}${index}`).textContent = archivedNotes;
-    document.querySelector(`#${activeIdPrefix}${index}`).textContent = activeNotes;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadNotesFromJSONFile(loadNotesToTable, fillSummaryTable);
+/*
+    Add event listeners
+ */
+document.addEventListener(eventListenerType.loaded, () => {
+    loadNotesFromJSONFile([loadNotesIntoTable, fillSummaryTable, loadArchivedNotesIntoTable]);
     fillSelectWithCategories();
 });
-addBtn.addEventListener('click', showPanelToAdd);
-closeBtn.addEventListener('click', hidePanel);
+addBtn.addEventListener(eventListenerType.click, showPanelToAdd);
+closeBtn.addEventListener(eventListenerType.click, hidePanel);
+openCloseArchiveBtn.addEventListener(eventListenerType.click, openCloseArchiveTable);
