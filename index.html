@@ -9,6 +9,7 @@
 </head>
 <body>
     <table>
+        <caption>Notes</caption>
         <thead>
             <tr>
                 <th>Name</th>
@@ -36,8 +37,8 @@
                 </td>
                 <td></td>
                 <td></td>
-                <td class="btn" id="save"><i class="fa fa-save"></i></td>
-                <td class="btn" id="close-panel"><i class="fa fa-times"></i></td>
+                <td class="btn" id="save" title="Save Note"><i class="fa fa-save"></i></td>
+                <td class="btn" id="close-panel" title="Close"><i class="fa fa-times"></i></td>
             </tr>
         </tfoot>
     </table>
@@ -52,6 +53,7 @@
         </button>
     </div>
     <table id="archived-table">
+        <caption>Archive</caption>
         <thead>
         <tr>
             <th>Name</th>
@@ -65,6 +67,7 @@
         <tbody id="archived-table-items"></tbody>
     </table>
     <table>
+        <caption>Summary</caption>
         <thead>
             <tr>
                 <th>Note Category</th>

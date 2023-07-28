@@ -30,6 +30,13 @@ export const eventListenerType = {
     loaded: "DOMContentLoaded"
 }
 
+export const tooltip = {
+    edit: "Edit Note",
+    archive: "Archive Note",
+    delete: "Delete Note",
+    unarchive: "Unarchive Note"
+}
+
 export const btnClass = "btn";
 export const activeIdPrefix = "active";
 export const archivedIdPrefix = "archived";

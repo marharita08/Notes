@@ -2,7 +2,8 @@ import {findDates} from "./findDates.js";
 import {getCategories} from "./categories.js";
 import {addNote, getNoteById, updateNote, deleteNote, getArchivedNotes, countArchivedNoteByCategory,
     loadNotesFromJSONFile, getActiveNotes, archiveNote, unarchiveNote, countActiveNoteByCategory} from "./notes.js";
-import {styleDisplay, archiveBtn, element, noteKey, btnClass, eventListenerType, activeIdPrefix, archivedIdPrefix} from "./strings.js";
+import {styleDisplay, archiveBtn, element, noteKey, btnClass, eventListenerType,
+    activeIdPrefix, archivedIdPrefix, tooltip} from "./strings.js";
 
 // Add/Edit panel
 const addEditPanel = document.querySelector("#add-edit-panel");
@@ -128,6 +129,11 @@ function addNewRowToMainTable(note) {
     updateCell.innerHTML = editIcon;
     archiveCell.innerHTML = archiveIcon;
     deleteCell.innerHTML = deleteIcon;
+
+    // add tooltips
+    updateCell.title = tooltip.edit;
+    archiveCell.title = tooltip.archive;
+    deleteCell.title = tooltip.delete;
 
     // add class to cells
     updateCell.classList.add(btnClass);
@@ -296,6 +302,7 @@ function addNewRowToArchive(note) {
     const unarchiveCell = createTableCell();
     const unarchiveIcon = document.querySelector("#unarchive-cell").innerHTML;
     unarchiveCell.innerHTML = unarchiveIcon;
+    unarchiveCell.title = tooltip.unarchive;
     unarchiveCell.classList.add(btnClass);
     unarchiveCell.addEventListener(eventListenerType.click, () => unarchiveNoteHandle(note.id));
 
