@@ -1,0 +1,47 @@
+table, #btn-container {
+    margin: 20px auto;
+    width: 80%;
+}
+table {
+    border-collapse: collapse;
+}
+table input, table select {
+    width: 100%;
+}
+#btn-container {
+    display: flex;
+    justify-content: right;
+}
+td, th {
+    padding: 10px;
+}
+thead tr {
+    background-color: #c7eac7;
+}
+tbody tr, tfoot tr {
+    background-color: #ecf8ec;
+}
+button {
+    background-color: #ecf8ec;
+    padding: 10px;
+    border: none;
+}
+button:hover, .btn:hover {
+    background-color: #c7eac7;
+}
+.btn {
+    text-align: center;
+}
+button i {
+    margin-right: 5px;
+}
+#add-edit-panel {
+    display: none;
+}
+#archived-table {
+    display: none;
+}
+caption {
+    font-size: 18px;
+    font-weight: bold;
+}

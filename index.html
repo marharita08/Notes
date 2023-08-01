@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" type="img/png" href="icon.png">
+</head>
+<body>
+    <table>
+        <caption>Notes</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Category</th>
+                <th>Content</th>
+                <th>Dates</th>
+                <th id="edit-cell"><i class="fa fa-pencil"></i></th>
+                <th id="archive-cell"><i class="fa fa-archive"></i></th>
+                <th id="delete-cell"><i class="fa fa-trash"></i></th>
+            </tr>
+        </thead>
+        <tbody id="main-table-items"></tbody>
+        <tfoot id="add-edit-panel">
+            <tr>
+                <td>
+                    <input id="input-name" name="input-name" type="text" placeholder="Name"/>
+                </td>
+                <td></td>
+                <td>
+                    <select id="select-category" name="select-category"></select>
+                </td>
+                <td>
+                    <input id="input-content" name="input-content" type="text" placeholder="Content"/>
+                </td>
+                <td></td>
+                <td></td>
+                <td class="btn" id="save" title="Save Note"><i class="fa fa-save"></i></td>
+                <td class="btn" id="close-panel" title="Close"><i class="fa fa-times"></i></td>
+            </tr>
+        </tfoot>
+    </table>
+    <div id="btn-container">
+        <button id="btn-open-close-archive">
+            <i class="fa fa-archive"></i>
+            Open Archive
+        </button>
+        <button id="btn-add" name="btn-add">
+            <i class="fa fa-plus inline"></i>
+            Add Note
+        </button>
+    </div>
+    <table id="archived-table">
+        <caption>Archive</caption>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Created</th>
+            <th>Category</th>
+            <th>Content</th>
+            <th>Dates</th>
+            <th id="unarchive-cell"><i class="fa fa-sign-out"></i></th>
+        </tr>
+        </thead>
+        <tbody id="archived-table-items"></tbody>
+    </table>
+    <table>
+        <caption>Summary</caption>
+        <thead>
+            <tr>
+                <th>Note Category</th>
+                <th>Active</th>
+                <th>Archived</th>
+            </tr>
+        </thead>
+        <tbody id="summary-table-items">
+
+        </tbody>
+    </table>
+
+</body>
+<script type='module' src='DOMService.js'></script>
+</html>
